@@ -21,7 +21,15 @@
         "dense": "cpp",
         "iostream": "cpp",
         "core": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "atomic": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "hash_map": "cpp",
+        "limits": "cpp",
+        "sstream": "cpp"
     },
     "cSpell.words": [
         "collectcomplete",

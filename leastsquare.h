@@ -31,18 +31,20 @@ private slots:
     void on_twAverage_itemChanged(QTableWidgetItem *item);
 
 signals:
-    void tableDataXYChanged(QVector<double> x, QVector<double> y);
+    void collectDataXYChanged(QVector<double> x, QVector<double> y);
     void fitDataChanged(QVector<double> x, QVector<double> y);
 
 private:
     Ui::LeastSquare *ui;
     int order;          // 最小二乘法多项式阶数
     int samplePointSum; // 标定点数
-    QVector<double> tableDataX, tableDataY;
+    QVector<double> collectDataX, collectDataY;
+    double collectDataX_Max, collectDataX_Min;
     QVector<double> fitDataX, fitDataY;
     QVector<double> factor;
     QRegExp rx;
-    QString old_text;
+    QString old_text = "";
+
 
     void updateTableDataXY(void);
 };

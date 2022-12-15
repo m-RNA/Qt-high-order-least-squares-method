@@ -87,7 +87,7 @@ QVector<double> method(int N, QVector<double> x, QVector<double> y)
     for (int i = 0; i <= N; i++)
     {
         double temp = W(i, 0);
-        if(abs(temp) >= 1e-10)
+        if (abs(temp) >= 1e-10)
             ans << temp;
         else
             ans << 0;
@@ -98,7 +98,7 @@ QVector<double> method(int N, QVector<double> x, QVector<double> y)
 
 void generateData(int left, int right, double step, QVector<double> &factor, QVector<double> &x, QVector<double> &y)
 {
-    if(left > right)
+    if (left > right)
     {
         int temp = right;
         right = left;
@@ -108,13 +108,13 @@ void generateData(int left, int right, double step, QVector<double> &factor, QVe
     y.clear();
     int order = factor.length();
     double temp;
-    for(double i = left; i <= right; i += step)
+    for (double i = left; i <= right; i += step)
     {
         x << i;
         temp = factor.at(order - 1);
-        for(int j = 1; j < order; j ++)
+        for (int j = 1; j < order; j++)
         {
-            temp +=  factor.at(order - 1 - j) * pow(i, j);
+            temp += factor.at(order - 1 - j) * pow(i, j);
         }
         y << temp;
         qDebug() << "generate:" << i << temp;
@@ -174,8 +174,8 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
         }
     }
 
-    connect(this, &LeastSquare::tableDataXYChanged, ui->chartFit, &CustomChart::scatterPlotUpdate);
-    connect(this, &LeastSquare::fitDataChanged, ui->chartFit, &CustomChart::linePlotUpdate);
+    connect(this, &LeastSquare::collectDataXYChanged, ui->chartFit, &CustomChart::updateCollectPlot);
+    connect(this, &LeastSquare::fitDataChanged, ui->chartFit, &CustomChart::updateFitPlot);
 }
 
 LeastSquare::~LeastSquare()
@@ -211,8 +211,8 @@ void LeastSquare::on_spbxOrder_valueChanged(int arg1)
 void LeastSquare::updateTableDataXY(void)
 {
     QString qsX, qsY;
-    tableDataX.clear(); // 重置x容器
-    tableDataY.clear(); // 重置y容器
+    collectDataX.clear(); // 重置x容器
+    collectDataY.clear(); // 重置y容器
     for (int i = 0; i < samplePointSum; i++)
     {
         qsX = ui->twAverage->item(i, 0)->text();
@@ -221,8 +221,8 @@ void LeastSquare::updateTableDataXY(void)
             continue;
         // qDebug() << "counter" << counter;
 
-        tableDataX << qsX.toDouble();
-        tableDataY << qsY.toDouble();
+        collectDataX << qsX.toDouble();
+        collectDataY << qsY.toDouble();
         qDebug() << i << ":" << qsX << qsY;
     }
 }
@@ -231,20 +231,23 @@ void LeastSquare::on_btnFit_clicked()
 {
     updateTableDataXY();
 
-    if (tableDataX.length() < 2)
+    if (collectDataX.length() < 2)
     {
-        QMessageBox::critical(this, "错误", "正确格式的数据小于两组");
+        QMessageBox::critical(this, "错误", "正确格式的数据\n小于两组");
         return;
     }
     factor.clear();
-    factor = method(order, tableDataX, tableDataY);
+    factor = method(order, collectDataX, collectDataY);
     for (int i = 0; i <= order; i++)
     {
         // 通过setItem来改变条目
         QTableWidgetItem *temp = new QTableWidgetItem(QString::number(factor.at(order - i)));
         ui->twFactor->setItem(i, 0, temp);
     }
-    generateData(min(tableDataX), max(tableDataX), 1, factor, fitDataX, fitDataY);
+    collectDataX_Max = max(collectDataX);
+    collectDataX_Min = min(collectDataX);
+    double addRange = (collectDataX_Max - collectDataX_Min) / 4.0;
+    generateData(collectDataX_Min - addRange, collectDataX_Max + addRange, 0.25, factor, fitDataX, fitDataY);
     emit fitDataChanged(fitDataX, fitDataY);
 }
 
@@ -277,13 +280,12 @@ void LeastSquare::on_twAverage_itemChanged(QTableWidgetItem *item)
             return; // 当有一格为空则退出
 
         updateTableDataXY();
-        if (tableDataX.length() > 0)
-            emit tableDataXYChanged(tableDataX, tableDataY);
+        if (collectDataX.length() > 0)
+            emit collectDataXYChanged(collectDataX, collectDataY);
     }
     else
     {
         qDebug() << "匹配失败";
-        // item->setText(old_text);  //更换之前的内容
+        item->setText(old_text); // 更换之前的内容
     }
 }
-

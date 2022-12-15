@@ -24,21 +24,16 @@ CustomChart::CustomChart(QWidget *parent) : QWidget(parent),
 	ui->customPlot->legend->setSelectedFont(legendFont);
 	ui->customPlot->legend->setSelectableParts(QCPLegend::spItems); // 图例框不能选择，只能选择图例项
 
-	QVector<double> latVector, latVector2, lonVector;
-	latVector << -75 << -50 << -50 << 0 << 50 << 100 << 75;
-	latVector2 << -89 << -45 << -23 << 0 << 12 << 45 << 78;
-	lonVector << -75 << -50 << -25 << 0 << 25 << 50 << 75;
-
 	QPen pen;
 	pen.setColor(Qt::darkGreen); // 设置画笔风格
-	pen.setWidth(2);
+	pen.setWidth(3);
+	pen.setStyle(Qt::PenStyle::DotLine); // 虚线
 
 	QCPGraph *curGraph = ui->customPlot->addGraph();
 	curGraph->setName(QString("平均"));
 	curGraph->setPen(pen);
-	curGraph->setLineStyle(QCPGraph::lsNone); // 散点
-	curGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlus));
-	curGraph->setData(latVector, lonVector);
+	curGraph->setLineStyle(QCPGraph::lsLine);							  // lsNone
+	curGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross)); //
 
 	// addRandomGraph();
 	ui->customPlot->addGraph();
@@ -46,8 +41,9 @@ CustomChart::CustomChart(QWidget *parent) : QWidget(parent),
 	ui->customPlot->graph()->setLineStyle(QCPGraph::lsLine); // 连线
 	ui->customPlot->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssNone));
 	pen.setColor(Qt ::red);
+	pen.setStyle(Qt::PenStyle::SolidLine); // 实线
+
 	ui->customPlot->graph()->setPen(pen);
-	ui->customPlot->graph()->setData(latVector2, lonVector);
 
 	// 连接将某些轴选择连接在一起的插槽（尤其是对面的轴）：
 	connect(ui->customPlot, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
@@ -75,7 +71,7 @@ CustomChart::~CustomChart()
 	delete ui;
 }
 
-// 双击坐标名称
+// 双击坐标标签
 void CustomChart::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 {
 	// 通过双击轴标签来设置轴标签
@@ -91,7 +87,7 @@ void CustomChart::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart pa
 		}
 	}
 }
-
+// 双击坐标轴
 void CustomChart::axisXYDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 {
 	// 通过双击轴来设置轴范围
@@ -108,7 +104,7 @@ void CustomChart::axisXYDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 		}
 	}
 }
-
+// 双击曲线标签
 void CustomChart::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *item)
 {
 	// 双击图例项重命名图形
@@ -164,7 +160,7 @@ void CustomChart::selectionChanged()
 		}
 	}
 }
-
+// 长按鼠标
 void CustomChart::mousePress()
 {
 	// 如果选择了轴，则只允许拖动该轴的方向
@@ -177,7 +173,7 @@ void CustomChart::mousePress()
 	else
 		ui->customPlot->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
 }
-
+// 鼠标滚轮
 void CustomChart::mouseWheel()
 {
 	// 如果选择了轴，则只允许缩放该轴的方向
@@ -190,16 +186,17 @@ void CustomChart::mouseWheel()
 	else
 		ui->customPlot->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
 }
-
+// 寻找曲线
 void CustomChart::findGraph()
 {
-	ui->customPlot->rescaleAxes(); // 调整显示区域
-	ui->customPlot->replot();	   // 刷新画图
+	ui->customPlot->rescaleAxes(true); // 调整显示区域
+	ui->customPlot->replot();		   // 刷新画图
 }
 
-void CustomChart::scatterPlotUpdate(QVector<double> x, QVector<double> y)
+// 更新采集的数据曲线
+void CustomChart::updateCollectPlot(QVector<double> x, QVector<double> y)
 {
-	qDebug() << "更新散点图";
+	qDebug() << "更新采集的数据曲线";
 	// 添加数据
 	ui->customPlot->graph(0)->setData(x, y);
 	// rescalseValueAxis
@@ -208,9 +205,10 @@ void CustomChart::scatterPlotUpdate(QVector<double> x, QVector<double> y)
 	ui->customPlot->replot(); // 刷新画图
 }
 
-void CustomChart::linePlotUpdate(QVector<double> x, QVector<double> y)
+// 更新拟合曲线
+void CustomChart::updateFitPlot(QVector<double> x, QVector<double> y)
 {
-	qDebug() << "更新折线图";
+	qDebug() << "更新拟合曲线";
 	// 添加数据
 	ui->customPlot->graph(1)->setData(x, y);
 	// rescalseValueAxis
@@ -225,33 +223,49 @@ void CustomChart::addVLine(double x)
 void CustomChart::addHLine(double y)
 {
 }
-
+// 清空图线
 void CustomChart::clear()
 {
-
-}
-
-void CustomChart::removeSelectedGraph()
-{
-	if (ui->customPlot->selectedGraphs().size() > 0)
-	{
-		ui->customPlot->removeGraph(ui->customPlot->selectedGraphs().first());
-		ui->customPlot->replot();
-	}
-}
-
-void CustomChart::removeAllGraphs()
-{
-	ui->customPlot->clearGraphs();
+	ui->customPlot->graph(0)->data()->clear();
+	ui->customPlot->graph(1)->data()->clear();
 	ui->customPlot->replot();
 }
 
+// 隐藏采集的数据曲线
+void CustomChart::hideCollectPlot()
+{
+	ui->customPlot->graph(0)->setVisible(false);
+	ui->customPlot->replot();
+}
+
+// 显示采集的数据曲线
+void CustomChart::showCollectPlot()
+{
+	ui->customPlot->graph(0)->setVisible(true);
+	ui->customPlot->replot();
+}
+
+// 隐藏拟合曲线
+void CustomChart::hideFitPlot()
+{
+	ui->customPlot->graph(1)->setVisible(false);
+	ui->customPlot->replot();
+}
+
+// 显示拟合曲线
+void CustomChart::showFitPlot()
+{
+	ui->customPlot->graph(1)->setVisible(true);
+	ui->customPlot->replot();
+}
+
+// 右键菜单
 void CustomChart::contextMenuRequest(QPoint pos)
 {
 	QMenu *menu = new QMenu(this);
 	menu->setAttribute(Qt::WA_DeleteOnClose);
 
-	if (ui->customPlot->legend->selectTest(pos, false) >= 0) // 请求图例上的右键菜单
+	if (ui->customPlot->legend->selectTest(pos, false) >= 0) // 请求曲线标签上的右键菜单
 	{
 		menu->addAction("移到左上角", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop | Qt::AlignLeft));
 		menu->addAction("移到正上方", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop | Qt::AlignHCenter));
@@ -261,17 +275,22 @@ void CustomChart::contextMenuRequest(QPoint pos)
 	}
 	else // 请求的图形上的通用右键菜单
 	{
-		menu->addAction("寻找曲线", this, SLOT(findGraph()));
-		menu->addAction("清除绘图", this, &CustomChart::clear);
-		if (ui->customPlot->selectedGraphs().size() > 0)
-			menu->addAction("隐藏所选曲线", this, SLOT(removeSelectedGraph()));
-		if (ui->customPlot->graphCount() > 0)
-			menu->addAction("显示所有曲线", this, SLOT(removeAllGraphs()));
-	}
+		menu->addAction("适应图线范围", this, &CustomChart::findGraph);
+		// menu->addAction("清空绘图", this, &CustomChart::clear);
+		if (ui->customPlot->graph(0)->visible())
+			menu->addAction("隐藏采集数据", this, &CustomChart::hideCollectPlot);
+		else
+			menu->addAction("显示采集数据", this, &CustomChart::showCollectPlot);
 
+		if (ui->customPlot->graph(1)->visible())
+			menu->addAction("隐藏拟合曲线", this, &CustomChart::hideFitPlot);
+		else
+			menu->addAction("显示拟合曲线", this, &CustomChart::showFitPlot);
+	}
 	menu->popup(ui->customPlot->mapToGlobal(pos));
 }
 
+// 移动曲线标签
 void CustomChart::moveLegend()
 {
 	if (QAction *contextAction = qobject_cast<QAction *>(sender())) // make sure this slot is really called by a context menu action, so it carries the data we need

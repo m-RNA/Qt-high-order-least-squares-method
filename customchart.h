@@ -20,8 +20,8 @@ public:
     ~CustomChart();
 
 public slots:
-    void scatterPlotUpdate(QVector<double> x, QVector<double> y); // 更新散点图
-    void linePlotUpdate(QVector<double> x, QVector<double> y);    // 更新折线图
+    void updateCollectPlot(QVector<double> x, QVector<double> y); // 更新散点图
+    void updateFitPlot(QVector<double> x, QVector<double> y);     // 更新折线图
 
     void addVLine(double x);
     void addHLine(double y);
@@ -36,12 +36,14 @@ private slots:
     void mousePress();
     void mouseWheel();
 
-    void findGraph();
-
-    void removeSelectedGraph();
-    void removeAllGraphs();
-    void contextMenuRequest(QPoint pos);
     void moveLegend();
+    void findGraph();
+    void hideCollectPlot();
+    void showCollectPlot();
+    void hideFitPlot();
+    void showFitPlot();
+
+    void contextMenuRequest(QPoint pos);
     void graphClicked(QCPAbstractPlottable *plottable, int dataIndex);
 
 private:
