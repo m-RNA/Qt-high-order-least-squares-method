@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "qt",
+            "includePath": [
+                "d:/Qt/Qt5.14.2/5.14.2/mingw73_64/include/**",
+                "D:/Qt/Qt5.14.2/5.14.2/mingw73_64/include/QtWidgets/",
+                "F:/Senior_Part1/GraduationProject/UpperComputer/TemperatureSensorCalibration/",
+                "F:/Senior_Part1/GraduationProject/UpperComputer/build-LeastSquareMethod-Desktop_Qt_5_14_2_MinGW_64_bit-Debug",
+                "D:/eigen-3.3.8/**",
+                "${workspaceRoot}/**",
+                "D:/Qt/ThirdPartyLib/qcustomplot/"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "D:/Qt/Qt5.14.2/Tools/mingw730_64/bin/g++.exe"
+        }
+    ],
+    "version": 4
+}

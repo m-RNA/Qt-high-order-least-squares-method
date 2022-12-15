@@ -1,0 +1,33 @@
+{
+    "files.associations": {
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "qserialportinfo": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp",
+        "qmessagebox": "cpp",
+        "qsplitter": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "ratio": "cpp",
+        "array": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "variant": "cpp",
+        "qinputdialog": "cpp",
+        "qapplication": "cpp",
+        "dense": "cpp",
+        "iostream": "cpp",
+        "core": "cpp",
+        "vector": "cpp"
+    },
+    "cSpell.words": [
+        "collectcomplete",
+        "Eigen",
+        "LEASTSQUARE",
+        "pgsb",
+        "STARTCOMMUNICATION"
+    ]
+}
