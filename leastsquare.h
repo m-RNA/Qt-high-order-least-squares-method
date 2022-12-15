@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTableWidgetItem>
+#include "bll_leastssquare.h"
 
 namespace Ui
 {
@@ -30,9 +31,14 @@ private slots:
 
     void on_twAverage_itemChanged(QTableWidgetItem *item);
 
+    void setFitChartData(QVector<double> factor);
+
 signals:
     void collectDataXYChanged(QVector<double> x, QVector<double> y);
     void fitDataChanged(QVector<double> x, QVector<double> y);
+
+    void startGenerate(int t_left, int t_right, double t_step, QVector<double> t_factor);
+    void startLeastSquare(int t_N, QVector<double> t_x, QVector<double> t_y);
 
 private:
     Ui::LeastSquare *ui;
@@ -41,10 +47,12 @@ private:
     QVector<double> collectDataX, collectDataY;
     double collectDataX_Max, collectDataX_Min;
     QVector<double> fitDataX, fitDataY;
-    QVector<double> factor;
     QRegExp rx;
     QString old_text = "";
 
+    // 任务类对象
+    Bll_GenerateData *taskGen;
+    Bll_LeastSquareMethod *taskLeastSquare;
 
     void updateTableDataXY(void);
 };

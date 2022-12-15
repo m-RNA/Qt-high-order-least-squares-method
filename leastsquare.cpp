@@ -1,101 +1,10 @@
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-#include <Eigen/Eigenvalues>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <cmath>
-using namespace Eigen;
-
 #include "leastsquare.h"
 #include "fitchart.h"
 #include "ui_leastsquare.h"
 #include <QDebug>
 #include <QString>
 #include <QMessageBox>
-
-/*
-    最小二乘法
-    https://blog.csdn.net/weixin_44344462/article/details/88850409
-
-    A W = B
-    AT A W = AT B
-    (AT A)^(-1) AT A W = (AT A)^(-1) AT B
-    W = (AT A)^(-1) AT B
-*/
-// 设置是N阶拟合
-QVector<double> method(int N, QVector<double> x, QVector<double> y)
-{
-    // 防御检查
-    if (x.size() != y.size())
-    {
-        qDebug() << "format error!";
-        return QVector<double>();
-    }
-
-    // 创建A矩阵
-    MatrixXd A(x.size(), N + 1);
-    for (int i = 0; i < x.size(); ++i) // 遍历所有点
-    {
-        for (int n = N, dex = 0; n >= 1; --n, ++dex) // 遍历N到1阶
-        {
-            A(i, dex) = pow(x.at(i), n);
-        }
-
-        A(i, N) = 1; //
-    }
-
-    // 创建B矩阵
-    MatrixXd B(y.size(), 1);
-    for (int i = 0; i < y.size(); ++i)
-    {
-        B(i, 0) = y.at(i);
-    }
-
-    // 创建矩阵W
-    MatrixXd W;
-    W = (A.transpose() * A).inverse() * A.transpose() * B;
-
-    // 打印W结果
-    qDebug() << "Factor:";
-    QVector<double> ans;
-    for (int i = 0; i <= N; i++)
-    {
-        double temp = W(i, 0);
-        if (abs(temp) >= 1e-10)
-            ans << temp;
-        else
-            ans << 0;
-        qDebug() << temp;
-    }
-    return ans;
-}
-
-void generateData(int left, int right, double step, QVector<double> &factor, QVector<double> &x, QVector<double> &y)
-{
-    if (left > right)
-    {
-        int temp = right;
-        right = left;
-        left = temp;
-    }
-    x.clear();
-    y.clear();
-    int order = factor.length();
-    double temp;
-    for (double i = left; i <= right; i += step)
-    {
-        x << i;
-        temp = factor.at(order - 1);
-        for (int j = 1; j < order; j++)
-        {
-            temp += factor.at(order - 1 - j) * pow(i, j);
-        }
-        y << temp;
-        qDebug() << "generate:" << i << temp;
-    }
-}
+#include <QThread>
 
 /*
     qt中获取容器Vector中的最大值和最小值：
@@ -117,6 +26,10 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
                                             ui(new Ui::LeastSquare)
 {
     ui->setupUi(this);
+
+    // 1. 创建任务类对象
+    taskGen = new Bll_GenerateData(this);
+    taskLeastSquare = new Bll_LeastSquareMethod(this);
 
     samplePointSum = ui->twAverage->rowCount();
     order = ui->spbxOrder->value();
@@ -151,7 +64,14 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
     }
 
     connect(this, &LeastSquare::collectDataXYChanged, ui->chartFit, &FitChart::updateCollectPlot);
-    connect(this, &LeastSquare::fitDataChanged, ui->chartFit, &FitChart::updateFitPlot);
+    // connect(this, &LeastSquare::fitDataChanged, ui->chartFit, &FitChart::updateFitPlot);
+
+    // 2. 链接子线程
+    connect(this, &LeastSquare::startGenerate, taskGen, &Bll_GenerateData::setGenerateFitData);
+    connect(taskGen, &Bll_GenerateData::generateFitDataFinish, ui->chartFit, &FitChart::updateFitPlot);
+
+    connect(this, &LeastSquare::startLeastSquare, taskLeastSquare, &Bll_LeastSquareMethod::setLeastSquareMethod);
+    connect(taskLeastSquare, &Bll_LeastSquareMethod::leastSquareMethodFinish, this, &LeastSquare::setFitChartData);
 }
 
 LeastSquare::~LeastSquare()
@@ -212,8 +132,14 @@ void LeastSquare::on_btnFit_clicked()
         QMessageBox::critical(this, "错误", "正确格式的数据\n小于两组");
         return;
     }
-    factor.clear();
-    factor = method(order, collectDataX, collectDataY);
+
+    // 启动子线程
+    emit startLeastSquare(order, collectDataX, collectDataY);
+    QThreadPool::globalInstance()->start(taskLeastSquare);
+}
+
+void LeastSquare::setFitChartData(QVector<double> factor)
+{
     for (int i = 0; i <= order; i++)
     {
         // 通过setItem来改变条目
@@ -223,8 +149,10 @@ void LeastSquare::on_btnFit_clicked()
     collectDataX_Max = max(collectDataX);
     collectDataX_Min = min(collectDataX);
     double addRange = (collectDataX_Max - collectDataX_Min) / 4.0;
-    generateData(collectDataX_Min - addRange, collectDataX_Max + addRange, 0.25, factor, fitDataX, fitDataY);
-    emit fitDataChanged(fitDataX, fitDataY);
+
+    // 启动子线程
+    emit startGenerate(collectDataX_Min - addRange, collectDataX_Max + addRange, 0.25, factor); // fitDataX, fitDataY);
+    QThreadPool::globalInstance()->start(taskGen);
 }
 
 void LeastSquare::on_twAverage_itemDoubleClicked(QTableWidgetItem *item)

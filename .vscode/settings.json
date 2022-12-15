@@ -30,13 +30,20 @@
         "hash_map": "cpp",
         "limits": "cpp",
         "sstream": "cpp",
-        "qwidget": "cpp"
+        "qwidget": "cpp",
+        "qelapsedtimer": "cpp",
+        "qthread": "cpp",
+        "cmath": "cpp",
+        "qrunnable": "cpp",
+        "qtablewidgetitem": "cpp",
+        "new": "cpp"
     },
     "cSpell.words": [
         "collectcomplete",
         "Eigen",
         "fitchart",
         "LEASTSQUARE",
+        "LEASTSSQUARE",
         "pgsb",
         "STARTCOMMUNICATION"
     ]
