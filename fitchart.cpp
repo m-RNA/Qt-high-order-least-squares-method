@@ -1,11 +1,10 @@
-#include "customchart.h"
-#include "ui_customchart.h"
+#include "fitchart.h"
+#include "ui_fitchart.h"
 #include <QInputDialog> // // 保留右上角关闭按钮 传参就ok
 
-CustomChart::CustomChart(QWidget *parent) : QWidget(parent),
-											ui(new Ui::CustomChart)
+FitChart::FitChart(QWidget *parent) : QWidget(parent),
+									  ui(new Ui::FitChart)
 {
-	srand(QDateTime::currentDateTime().toTime_t());
 	ui->setupUi(this);
 
 	ui->customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
@@ -66,13 +65,13 @@ CustomChart::CustomChart(QWidget *parent) : QWidget(parent),
 	connect(ui->customPlot, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
 }
 
-CustomChart::~CustomChart()
+FitChart::~FitChart()
 {
 	delete ui;
 }
 
 // 双击坐标标签
-void CustomChart::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
+void FitChart::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 {
 	// 通过双击轴标签来设置轴标签
 	if (part == QCPAxis::spAxisLabel) // only react when the actual axis label is clicked, not tick label or axis backbone
@@ -88,7 +87,7 @@ void CustomChart::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart pa
 	}
 }
 // 双击坐标轴
-void CustomChart::axisXYDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
+void FitChart::axisXYDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 {
 	// 通过双击轴来设置轴范围
 	if (part == QCPAxis::spAxis)
@@ -105,7 +104,7 @@ void CustomChart::axisXYDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 	}
 }
 // 双击曲线标签
-void CustomChart::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *item)
+void FitChart::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *item)
 {
 	// 双击图例项重命名图形
 	Q_UNUSED(legend)
@@ -123,7 +122,7 @@ void CustomChart::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *it
 	}
 }
 
-void CustomChart::selectionChanged()
+void FitChart::selectionChanged()
 {
 	/*
 	通常，轴基线、轴刻度标签和轴标签可以单独选择，但我们希望使用时它两一个整体，
@@ -161,7 +160,7 @@ void CustomChart::selectionChanged()
 	}
 }
 // 长按鼠标
-void CustomChart::mousePress()
+void FitChart::mousePress()
 {
 	// 如果选择了轴，则只允许拖动该轴的方向
 	// 如果未选择轴，则可以拖动两个方向
@@ -174,7 +173,7 @@ void CustomChart::mousePress()
 		ui->customPlot->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
 }
 // 鼠标滚轮
-void CustomChart::mouseWheel()
+void FitChart::mouseWheel()
 {
 	// 如果选择了轴，则只允许缩放该轴的方向
 	// 如果未选择轴，则可以缩放两个方向
@@ -187,14 +186,14 @@ void CustomChart::mouseWheel()
 		ui->customPlot->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
 }
 // 寻找曲线
-void CustomChart::findGraph()
+void FitChart::findGraph()
 {
 	ui->customPlot->rescaleAxes(true); // 调整显示区域
 	ui->customPlot->replot();		   // 刷新画图
 }
 
 // 更新采集的数据曲线
-void CustomChart::updateCollectPlot(QVector<double> x, QVector<double> y)
+void FitChart::updateCollectPlot(QVector<double> x, QVector<double> y)
 {
 	qDebug() << "更新采集的数据曲线";
 	// 添加数据
@@ -206,7 +205,7 @@ void CustomChart::updateCollectPlot(QVector<double> x, QVector<double> y)
 }
 
 // 更新拟合曲线
-void CustomChart::updateFitPlot(QVector<double> x, QVector<double> y)
+void FitChart::updateFitPlot(QVector<double> x, QVector<double> y)
 {
 	qDebug() << "更新拟合曲线";
 	// 添加数据
@@ -216,15 +215,15 @@ void CustomChart::updateFitPlot(QVector<double> x, QVector<double> y)
 	ui->customPlot->replot(); // 刷新画图
 }
 
-void CustomChart::addVLine(double x)
+void FitChart::addVLine(double x)
 {
 }
 
-void CustomChart::addHLine(double y)
+void FitChart::addHLine(double y)
 {
 }
 // 清空图线
-void CustomChart::clear()
+void FitChart::clear()
 {
 	ui->customPlot->graph(0)->data()->clear();
 	ui->customPlot->graph(1)->data()->clear();
@@ -232,35 +231,35 @@ void CustomChart::clear()
 }
 
 // 隐藏采集的数据曲线
-void CustomChart::hideCollectPlot()
+void FitChart::hideCollectPlot()
 {
 	ui->customPlot->graph(0)->setVisible(false);
 	ui->customPlot->replot();
 }
 
 // 显示采集的数据曲线
-void CustomChart::showCollectPlot()
+void FitChart::showCollectPlot()
 {
 	ui->customPlot->graph(0)->setVisible(true);
 	ui->customPlot->replot();
 }
 
 // 隐藏拟合曲线
-void CustomChart::hideFitPlot()
+void FitChart::hideFitPlot()
 {
 	ui->customPlot->graph(1)->setVisible(false);
 	ui->customPlot->replot();
 }
 
 // 显示拟合曲线
-void CustomChart::showFitPlot()
+void FitChart::showFitPlot()
 {
 	ui->customPlot->graph(1)->setVisible(true);
 	ui->customPlot->replot();
 }
 
 // 右键菜单
-void CustomChart::contextMenuRequest(QPoint pos)
+void FitChart::contextMenuRequest(QPoint pos)
 {
 	QMenu *menu = new QMenu(this);
 	menu->setAttribute(Qt::WA_DeleteOnClose);
@@ -275,23 +274,23 @@ void CustomChart::contextMenuRequest(QPoint pos)
 	}
 	else // 请求的图形上的通用右键菜单
 	{
-		menu->addAction("适应图线范围", this, &CustomChart::findGraph);
-		// menu->addAction("清空绘图", this, &CustomChart::clear);
+		menu->addAction("适应图线范围", this, &FitChart::findGraph);
+		// menu->addAction("清空绘图", this, &FitChart::clear);
 		if (ui->customPlot->graph(0)->visible())
-			menu->addAction("隐藏采集数据", this, &CustomChart::hideCollectPlot);
+			menu->addAction("隐藏采集数据", this, &FitChart::hideCollectPlot);
 		else
-			menu->addAction("显示采集数据", this, &CustomChart::showCollectPlot);
+			menu->addAction("显示采集数据", this, &FitChart::showCollectPlot);
 
 		if (ui->customPlot->graph(1)->visible())
-			menu->addAction("隐藏拟合曲线", this, &CustomChart::hideFitPlot);
+			menu->addAction("隐藏拟合曲线", this, &FitChart::hideFitPlot);
 		else
-			menu->addAction("显示拟合曲线", this, &CustomChart::showFitPlot);
+			menu->addAction("显示拟合曲线", this, &FitChart::showFitPlot);
 	}
 	menu->popup(ui->customPlot->mapToGlobal(pos));
 }
 
 // 移动曲线标签
-void CustomChart::moveLegend()
+void FitChart::moveLegend()
 {
 	if (QAction *contextAction = qobject_cast<QAction *>(sender())) // make sure this slot is really called by a context menu action, so it carries the data we need
 	{																// 确保这个槽真的是由上下文菜单操作调用的，所以它携带了我们需要的数据
@@ -305,7 +304,7 @@ void CustomChart::moveLegend()
 	}
 }
 
-void CustomChart::graphClicked(QCPAbstractPlottable *plottable, int dataIndex)
+void FitChart::graphClicked(QCPAbstractPlottable *plottable, int dataIndex)
 {
 	// since we know we only have QCPGraphs in the plot, we can immediately access interface1D()
 	// usually it's better to first check whether interface1D() returns non-zero, and only then use it.

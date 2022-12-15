@@ -7,15 +7,17 @@ INCLUDEPATH += D:\eigen-3.3.8 D:\Qt\ThirdPartyLib\qcustomplot
 
 SOURCES += \
         D:/Qt/ThirdPartyLib/qcustomplot/qcustomplot.cpp \
-        customchart.cpp \
+        bll_leastssquare.cpp \
+        fitchart.cpp \
         leastsquare.cpp \
         main.cpp
 
 FORMS += \
-    customchart.ui \
+    fitchart.ui \
     leastsquare.ui
 
 HEADERS += \
     D:/Qt/ThirdPartyLib/qcustomplot/qcustomplot.h \
-    customchart.h \
+    bll_leastssquare.h \
+    fitchart.h \
     leastsquare.h

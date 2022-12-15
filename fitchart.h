@@ -1,23 +1,21 @@
-#ifndef CUSTOMCHART_H
-#define CUSTOMCHART_H
+#ifndef FITCHART_H
+#define FITCHART_H
 
 #include <QWidget>
 #include "qcustomplot.h"
-#include <vector>
-using namespace std;
 
 namespace Ui
 {
-    class CustomChart;
+    class FitChart;
 }
 
-class CustomChart : public QWidget
+class FitChart : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit CustomChart(QWidget *parent = nullptr);
-    ~CustomChart();
+    explicit FitChart(QWidget *parent = nullptr);
+    ~FitChart();
 
 public slots:
     void updateCollectPlot(QVector<double> x, QVector<double> y); // 更新散点图
@@ -47,7 +45,7 @@ private slots:
     void graphClicked(QCPAbstractPlottable *plottable, int dataIndex);
 
 private:
-    Ui::CustomChart *ui;
+    Ui::FitChart *ui;
     unsigned int x_default = 0;
     double xRange = 80;
 };

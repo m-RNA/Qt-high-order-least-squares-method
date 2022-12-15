@@ -29,11 +29,13 @@
         "unordered_map": "cpp",
         "hash_map": "cpp",
         "limits": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "qwidget": "cpp"
     },
     "cSpell.words": [
         "collectcomplete",
         "Eigen",
+        "fitchart",
         "LEASTSQUARE",
         "pgsb",
         "STARTCOMMUNICATION"

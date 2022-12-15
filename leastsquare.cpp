@@ -9,35 +9,11 @@
 using namespace Eigen;
 
 #include "leastsquare.h"
+#include "fitchart.h"
 #include "ui_leastsquare.h"
-#include "customchart.h"
 #include <QDebug>
 #include <QString>
 #include <QMessageBox>
-
-QVector<double> method(int N, QVector<double> x, QVector<double> y);
-void test()
-{
-    int power = 1;
-
-    QVector<double> x, y;
-    QVector<double> result;
-
-    //    for (int i = 0; i < 100; i++)
-    //    {
-    //        x.push_back(i);
-    //        y.push_back(i * i * 2 + (rand() % 4));
-    //    }
-    x << 1 << 3;
-    y << 2 << 4;
-    result = method(power, x, y);
-
-    qDebug() << " result:";
-    for (int i = 0; i <= power; i++)
-    {
-        qDebug() << result.at(i);
-    }
-}
 
 /*
     最小二乘法
@@ -174,8 +150,8 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
         }
     }
 
-    connect(this, &LeastSquare::collectDataXYChanged, ui->chartFit, &CustomChart::updateCollectPlot);
-    connect(this, &LeastSquare::fitDataChanged, ui->chartFit, &CustomChart::updateFitPlot);
+    connect(this, &LeastSquare::collectDataXYChanged, ui->chartFit, &FitChart::updateCollectPlot);
+    connect(this, &LeastSquare::fitDataChanged, ui->chartFit, &FitChart::updateFitPlot);
 }
 
 LeastSquare::~LeastSquare()

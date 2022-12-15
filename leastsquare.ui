@@ -25,7 +25,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="CustomChart" name="chartFit" native="true">
+     <widget class="FitChart" name="chartFit" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -190,7 +190,7 @@
            <string>拟合</string>
           </property>
           <property name="icon">
-           <iconset resource="../TemperatureSensorCalibration/main.qrc">
+           <iconset>
             <normaloff>:/icon/fit.ico</normaloff>:/icon/fit.ico</iconset>
           </property>
          </widget>
@@ -207,7 +207,7 @@
            <string>保存</string>
           </property>
           <property name="icon">
-           <iconset resource="../TemperatureSensorCalibration/main.qrc">
+           <iconset>
             <normaloff>:/icon/save.ico</normaloff>:/icon/save.ico</iconset>
           </property>
          </widget>
@@ -260,13 +260,13 @@
            <number>1</number>
           </property>
           <attribute name="horizontalHeaderVisible">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
           <attribute name="horizontalHeaderHighlightSections">
            <bool>true</bool>
           </attribute>
           <attribute name="verticalHeaderVisible">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
           <row/>
           <row/>
@@ -282,9 +282,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CustomChart</class>
+   <class>FitChart</class>
    <extends>QWidget</extends>
-   <header location="global">customchart.h</header>
+   <header>fitchart.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
