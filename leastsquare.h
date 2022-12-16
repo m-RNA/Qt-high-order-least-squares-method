@@ -54,7 +54,8 @@ private:
     Bll_GenerateData *taskGen;
     Bll_LeastSquareMethod *taskLeastSquare;
 
-    void updateTableDataXY(void);
+    void updateCollectDataXY(void);
+    void tryUpdateFitChart(bool man);
 };
 
 #endif // LEASTSQUARE_H

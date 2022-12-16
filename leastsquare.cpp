@@ -79,6 +79,46 @@ LeastSquare::~LeastSquare()
     delete ui;
 }
 
+void LeastSquare::updateCollectDataXY(void)
+{
+    QString qsX, qsY;
+    collectDataX.clear(); // 重置x容器
+    collectDataY.clear(); // 重置y容器
+    for (int i = 0; i < samplePointSum; i++)
+    {
+        qsX = ui->twAverage->item(i, 0)->text();
+        qsY = ui->twAverage->item(i, 1)->text();
+        if (qsX.isEmpty() || qsY.isEmpty())
+            continue;
+        // qDebug() << "counter" << counter;
+
+        collectDataX << qsX.toDouble();
+        collectDataY << qsY.toDouble();
+        qDebug() << i << ":" << qsX << qsY;
+    }
+}
+
+// 人为 true 自动 false
+void LeastSquare::tryUpdateFitChart(bool man)
+{
+    updateCollectDataXY();
+    if (collectDataX.length() < 2)
+    {
+        if (man) // 是人为的就要提醒一下
+            QMessageBox::critical(this, "错误", "正确格式的数据\n小于两组");
+        return;
+    }
+
+    // N个点可以确定一个 唯一的 N-1 阶的曲线
+    order = ui->spbxOrder->text().toInt();
+    if (collectDataX.length() <= order)
+        order = collectDataX.length() - 1;
+
+    // 启动子线程
+    emit startLeastSquare(order, collectDataX, collectDataY);
+    QThreadPool::globalInstance()->start(taskLeastSquare);
+}
+
 void LeastSquare::on_spbxSamplePointSum_valueChanged(int arg1)
 {
     ui->twAverage->setRowCount(arg1);
@@ -101,41 +141,13 @@ void LeastSquare::on_spbxOrder_valueChanged(int arg1)
     order = arg1;
     ui->twFactor->setRowCount(arg1 + 1);
     qDebug() << "order:" << order;
-    emit;
-}
 
-void LeastSquare::updateTableDataXY(void)
-{
-    QString qsX, qsY;
-    collectDataX.clear(); // 重置x容器
-    collectDataY.clear(); // 重置y容器
-    for (int i = 0; i < samplePointSum; i++)
-    {
-        qsX = ui->twAverage->item(i, 0)->text();
-        qsY = ui->twAverage->item(i, 1)->text();
-        if (qsX.isEmpty() || qsY.isEmpty())
-            continue;
-        // qDebug() << "counter" << counter;
-
-        collectDataX << qsX.toDouble();
-        collectDataY << qsY.toDouble();
-        qDebug() << i << ":" << qsX << qsY;
-    }
+    tryUpdateFitChart(false);
 }
 
 void LeastSquare::on_btnFit_clicked()
 {
-    updateTableDataXY();
-
-    if (collectDataX.length() < 2)
-    {
-        QMessageBox::critical(this, "错误", "正确格式的数据\n小于两组");
-        return;
-    }
-
-    // 启动子线程
-    emit startLeastSquare(order, collectDataX, collectDataY);
-    QThreadPool::globalInstance()->start(taskLeastSquare);
+    tryUpdateFitChart(true);
 }
 
 void LeastSquare::setFitChartData(QVector<double> factor)
@@ -186,7 +198,7 @@ void LeastSquare::on_twAverage_itemChanged(QTableWidgetItem *item)
             ui->twAverage->item(row, 1)->text().isEmpty())
             return; // 当有一格为空时，退出
 
-        updateTableDataXY();
+        updateCollectDataXY();
         if (collectDataX.length() > 0)
             emit collectDataXYChanged(collectDataX, collectDataY);
     }

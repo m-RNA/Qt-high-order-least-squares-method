@@ -163,14 +163,22 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="editable">
+           <bool>false</bool>
+          </property>
           <item>
            <property name="text">
-            <string>一般</string>
+            <string>多项式</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>指数</string>
+            <string>指数型</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>对数型</string>
            </property>
           </item>
          </widget>

@@ -36,7 +36,9 @@
         "cmath": "cpp",
         "qrunnable": "cpp",
         "qtablewidgetitem": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
     },
     "cSpell.words": [
         "CHARTTRACER",

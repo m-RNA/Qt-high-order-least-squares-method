@@ -35,7 +35,7 @@ void Bll_GenerateData::run()
     }
     x.clear();
     y.clear();
-    int order = factor.length();
+    int order = factor.length(); // 阶数
     double temp;
     for (double i = left; i <= right; i += step)
     {
@@ -58,7 +58,7 @@ Bll_LeastSquareMethod::Bll_LeastSquareMethod(QObject *parent) : QObject(parent),
 }
 
 /*
-    最小二乘法
+    最小二乘法参考：
     https://blog.csdn.net/weixin_44344462/article/details/88850409
 
     A W = B
@@ -73,6 +73,7 @@ void Bll_LeastSquareMethod::run()
     eTimer.start();
     qDebug() << "生成拟合数据线程ID：" << QThread::currentThread();
 
+    // 这里默认格式正确，就不检查了
     // QVector<double> method00(int N, QVector<double> x, QVector<double> y)
     //  防御检查
     // if (x.size() != y.size())
@@ -80,6 +81,10 @@ void Bll_LeastSquareMethod::run()
     //     qDebug() << "format error!";
     //     return QVector<double>();
     // }
+
+    // N个点可以确定一个 唯一的 N-1 阶的曲线
+    if (x.length() <= N)
+        N = x.length() - 1;
 
     // 创建A矩阵
     MatrixXd A(x.size(), N + 1);
