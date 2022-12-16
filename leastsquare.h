@@ -27,7 +27,7 @@ private slots:
 
     void on_btnFit_clicked();
 
-    void on_twAverage_itemDoubleClicked(QTableWidgetItem *item);
+    void on_twAverage_itemSelectionChanged();
 
     void on_twAverage_itemChanged(QTableWidgetItem *item);
 

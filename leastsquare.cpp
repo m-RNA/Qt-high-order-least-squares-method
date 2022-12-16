@@ -155,10 +155,12 @@ void LeastSquare::setFitChartData(QVector<double> factor)
     QThreadPool::globalInstance()->start(taskGen);
 }
 
-void LeastSquare::on_twAverage_itemDoubleClicked(QTableWidgetItem *item)
+void LeastSquare::on_twAverage_itemSelectionChanged()
 {
     // 1、记录旧的单元格内容
-    old_text = item->text();
+    old_text = ui->twAverage->item(ui->twAverage->currentRow(),
+                                   ui->twAverage->currentColumn())
+                   ->text();
 }
 
 /*
@@ -179,9 +181,10 @@ void LeastSquare::on_twAverage_itemChanged(QTableWidgetItem *item)
     {
         qDebug() << "匹配成功";
         int row = item->row();
+        old_text = ""; // 替换为空
         if (ui->twAverage->item(row, 0)->text().isEmpty() ||
             ui->twAverage->item(row, 1)->text().isEmpty())
-            return; // 当有一格为空则退出
+            return; // 当有一格为空时，退出
 
         updateTableDataXY();
         if (collectDataX.length() > 0)
