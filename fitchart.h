@@ -3,13 +3,14 @@
 
 #include <QWidget>
 #include "qcustomplot.h"
+#include "charttracer.h"
 
 namespace Ui
 {
     class FitChart;
 }
 
-class FitChart : public QWidget
+class FitChart : public QCustomPlot
 {
     Q_OBJECT
 
@@ -33,6 +34,7 @@ private slots:
     void selectionChanged();
     void mousePress();
     void mouseWheel();
+    void mouseMove(QMouseEvent *ev);
 
     void moveLegend();
     void findGraph();
@@ -45,7 +47,8 @@ private slots:
     void graphClicked(QCPAbstractPlottable *plottable, int dataIndex);
 
 private:
-    Ui::FitChart *ui;
+    ChartTracer *mxTracer = nullptr; // 坐标跟随鼠标.使用时创建
+
     unsigned int x_default = 0;
     double xRange = 80;
 };

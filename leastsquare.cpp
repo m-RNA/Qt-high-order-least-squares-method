@@ -181,7 +181,7 @@ void LeastSquare::on_twAverage_itemChanged(QTableWidgetItem *item)
     {
         qDebug() << "匹配成功";
         int row = item->row();
-        old_text = ""; // 替换为空
+        // old_text = ""; // 替换为空
         if (ui->twAverage->item(row, 0)->text().isEmpty() ||
             ui->twAverage->item(row, 1)->text().isEmpty())
             return; // 当有一格为空时，退出

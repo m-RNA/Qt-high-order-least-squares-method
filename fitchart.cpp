@@ -1,73 +1,74 @@
 #include "fitchart.h"
-#include "ui_fitchart.h"
-#include <QInputDialog> // // 保留右上角关闭按钮 传参就ok
+#include <QInputDialog> // 保留右上角关闭按钮 传参就ok
 
-FitChart::FitChart(QWidget *parent) : QWidget(parent),
-									  ui(new Ui::FitChart)
+FitChart::FitChart(QWidget *parent) : QCustomPlot(parent)
 {
-	ui->setupUi(this);
+	mxTracer = new ChartTracer(this, this->graph(), TracerType::DataTracer);
 
-	ui->customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
-									QCP::iSelectLegend | QCP::iSelectPlottables);
-	ui->customPlot->xAxis->setRange(-8, 8);
-	ui->customPlot->yAxis->setRange(-5, 5);
-	ui->customPlot->axisRect()->setupFullAxesBox();
+	this->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
+						  QCP::iSelectLegend | QCP::iSelectPlottables);
+	this->xAxis->setRange(-8, 8);
+	this->yAxis->setRange(-5, 5);
+	this->axisRect()->setupFullAxesBox();
 
-	ui->customPlot->xAxis->setLabel("x轴");
-	ui->customPlot->yAxis->setLabel("y轴");
-	ui->customPlot->legend->setVisible(true);
+	this->xAxis->setLabel("x轴");
+	this->yAxis->setLabel("y轴");
+	this->legend->setVisible(true);
 
 	QFont legendFont = font();
 	legendFont.setPointSize(10);
-	ui->customPlot->legend->setFont(legendFont);
-	ui->customPlot->legend->setSelectedFont(legendFont);
-	ui->customPlot->legend->setSelectableParts(QCPLegend::spItems); // 图例框不能选择，只能选择图例项
+	this->legend->setFont(legendFont);
+	this->legend->setSelectedFont(legendFont);
+	this->legend->setSelectableParts(QCPLegend::spItems); // 图例框不能选择，只能选择图例项
 
 	QPen pen;
 	pen.setColor(Qt::darkGreen); // 设置画笔风格
 	pen.setWidth(3);
 	pen.setStyle(Qt::PenStyle::DotLine); // 虚线
 
-	QCPGraph *curGraph = ui->customPlot->addGraph();
+	QCPGraph *curGraph = this->addGraph();
 	curGraph->setName(QString("平均"));
 	curGraph->setPen(pen);
 	curGraph->setLineStyle(QCPGraph::lsLine);							  // lsNone
 	curGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross)); //
 
 	// addRandomGraph();
-	ui->customPlot->addGraph();
-	ui->customPlot->graph()->setName(QString("拟合"));		 // .arg(ui->customPlot->graphCount()-1) 这个可以添加编号
-	ui->customPlot->graph()->setLineStyle(QCPGraph::lsLine); // 连线
-	ui->customPlot->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssNone));
+	this->addGraph();
+	this->graph()->setName(QString("拟合"));	   // .arg(this->graphCount()-1) 这个可以添加编号
+	this->graph()->setLineStyle(QCPGraph::lsLine); // 连线
+	this->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssNone));
 	pen.setColor(Qt ::red);
 	pen.setStyle(Qt::PenStyle::SolidLine); // 实线
 
-	ui->customPlot->graph()->setPen(pen);
+	this->graph()->setPen(pen);
 
 	// 连接将某些轴选择连接在一起的插槽（尤其是对面的轴）：
-	connect(ui->customPlot, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
+	connect(this, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
 
 	// 连接插槽，注意选择轴时，只能拖动和缩放该方向：
-	connect(ui->customPlot, SIGNAL(mousePress(QMouseEvent *)), this, SLOT(mousePress()));
-	connect(ui->customPlot, SIGNAL(mouseWheel(QWheelEvent *)), this, SLOT(mouseWheel()));
+	connect(this, &QCustomPlot::mousePress, this, &FitChart::mousePress);
+	connect(this, &QCustomPlot::mouseWheel, this, &FitChart::mouseWheel);
+	// connect(this, SIGNAL(mousePressEvent(QMouseEvent *)), this, SLOT(mousePressEvent(QMouseEvent *)));
+	// connect(this, SIGNAL(mouseWheel(QWheelEvent *)), this, SLOT(mouseWheel()));
+	//    connect(this, &QCustomPlot::mouseMove, this, &FitChart::mouseMove);
 
 	// 使底部和左侧轴将其范围镜像到顶部和右侧轴：
-	connect(ui->customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->customPlot->xAxis2, SLOT(setRange(QCPRange)));
-	connect(ui->customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->customPlot->yAxis2, SLOT(setRange(QCPRange)));
+	connect(this->xAxis, SIGNAL(rangeChanged(QCPRange)), this->xAxis2, SLOT(setRange(QCPRange)));
+	connect(this->yAxis, SIGNAL(rangeChanged(QCPRange)), this->yAxis2, SLOT(setRange(QCPRange)));
 
 	// 连接一些交互槽：
-	connect(ui->customPlot, SIGNAL(axisDoubleClick(QCPAxis *, QCPAxis::SelectablePart, QMouseEvent *)), this, SLOT(axisLabelDoubleClick(QCPAxis *, QCPAxis::SelectablePart)));
-	connect(ui->customPlot, SIGNAL(axisDoubleClick(QCPAxis *, QCPAxis::SelectablePart, QMouseEvent *)), this, SLOT(axisXYDoubleClick(QCPAxis *, QCPAxis::SelectablePart)));
-	connect(ui->customPlot, SIGNAL(legendDoubleClick(QCPLegend *, QCPAbstractLegendItem *, QMouseEvent *)), this, SLOT(legendDoubleClick(QCPLegend *, QCPAbstractLegendItem *)));
+	connect(this, SIGNAL(axisDoubleClick(QCPAxis *, QCPAxis::SelectablePart, QMouseEvent *)), this, SLOT(axisLabelDoubleClick(QCPAxis *, QCPAxis::SelectablePart)));
+	connect(this, SIGNAL(axisDoubleClick(QCPAxis *, QCPAxis::SelectablePart, QMouseEvent *)), this, SLOT(axisXYDoubleClick(QCPAxis *, QCPAxis::SelectablePart)));
+	connect(this, SIGNAL(legendDoubleClick(QCPLegend *, QCPAbstractLegendItem *, QMouseEvent *)), this, SLOT(legendDoubleClick(QCPLegend *, QCPAbstractLegendItem *)));
 
 	// 设置右键菜单弹出窗口的策略和连接槽：
-	ui->customPlot->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(ui->customPlot, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
+	this->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
 }
 
 FitChart::~FitChart()
 {
-	delete ui;
+	delete mxTracer;
 }
 
 // 双击坐标标签
@@ -82,7 +83,7 @@ void FitChart::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 		if (ok)
 		{
 			axis->setLabel(newLabel);
-			ui->customPlot->replot();
+			this->replot();
 		}
 	}
 }
@@ -99,7 +100,7 @@ void FitChart::axisXYDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 		if (ok)
 		{
 			axis->setRange(x_default, xRange, Qt::AlignRight); // 右对齐
-			ui->customPlot->replot();
+			this->replot();
 		}
 	}
 }
@@ -117,7 +118,7 @@ void FitChart::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *item)
 		if (ok)
 		{
 			plItem->plottable()->setName(newName);
-			ui->customPlot->replot();
+			this->replot();
 		}
 	}
 }
@@ -133,25 +134,25 @@ void FitChart::selectionChanged()
 	*/
 
 	// 使上下轴同步选择，并将轴和记号标签作为一个可选对象处理：
-	if (ui->customPlot->xAxis->selectedParts().testFlag(QCPAxis::spAxis) || ui->customPlot->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
-		ui->customPlot->xAxis2->selectedParts().testFlag(QCPAxis::spAxis) || ui->customPlot->xAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
+	if (this->xAxis->selectedParts().testFlag(QCPAxis::spAxis) || this->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
+		this->xAxis2->selectedParts().testFlag(QCPAxis::spAxis) || this->xAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
 	{
-		ui->customPlot->xAxis2->setSelectedParts(QCPAxis::spAxis | QCPAxis::spTickLabels);
-		ui->customPlot->xAxis->setSelectedParts(QCPAxis::spAxis | QCPAxis::spTickLabels);
+		this->xAxis2->setSelectedParts(QCPAxis::spAxis | QCPAxis::spTickLabels);
+		this->xAxis->setSelectedParts(QCPAxis::spAxis | QCPAxis::spTickLabels);
 	}
 	// 使左右轴同步选择，并将轴和记号标签作为一个可选对象处理：
-	if (ui->customPlot->yAxis->selectedParts().testFlag(QCPAxis::spAxis) || ui->customPlot->yAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
-		ui->customPlot->yAxis2->selectedParts().testFlag(QCPAxis::spAxis) || ui->customPlot->yAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
+	if (this->yAxis->selectedParts().testFlag(QCPAxis::spAxis) || this->yAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
+		this->yAxis2->selectedParts().testFlag(QCPAxis::spAxis) || this->yAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
 	{
-		ui->customPlot->yAxis2->setSelectedParts(QCPAxis::spAxis | QCPAxis::spTickLabels);
-		ui->customPlot->yAxis->setSelectedParts(QCPAxis::spAxis | QCPAxis::spTickLabels);
+		this->yAxis2->setSelectedParts(QCPAxis::spAxis | QCPAxis::spTickLabels);
+		this->yAxis->setSelectedParts(QCPAxis::spAxis | QCPAxis::spTickLabels);
 	}
 
 	// 将曲线的选择与相应图例项的选择同步：
-	for (int i = 0; i < ui->customPlot->graphCount(); ++i)
+	for (int i = 0; i < this->graphCount(); ++i)
 	{
-		QCPGraph *graph = ui->customPlot->graph(i);
-		QCPPlottableLegendItem *item = ui->customPlot->legend->itemWithPlottable(graph);
+		QCPGraph *graph = this->graph(i);
+		QCPPlottableLegendItem *item = this->legend->itemWithPlottable(graph);
 		if (item->selected() || graph->selected())
 		{
 			item->setSelected(true);
@@ -165,12 +166,13 @@ void FitChart::mousePress()
 	// 如果选择了轴，则只允许拖动该轴的方向
 	// 如果未选择轴，则可以拖动两个方向
 
-	if (ui->customPlot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
-		ui->customPlot->axisRect()->setRangeDrag(ui->customPlot->xAxis->orientation());
-	else if (ui->customPlot->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
-		ui->customPlot->axisRect()->setRangeDrag(ui->customPlot->yAxis->orientation());
+	if (this->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
+		this->axisRect()->setRangeDrag(this->xAxis->orientation());
+	else if (this->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
+		this->axisRect()->setRangeDrag(this->yAxis->orientation());
 	else
-		ui->customPlot->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
+		this->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
+	// QCustomPlot::mousePressEvent(ev);
 }
 // 鼠标滚轮
 void FitChart::mouseWheel()
@@ -178,18 +180,82 @@ void FitChart::mouseWheel()
 	// 如果选择了轴，则只允许缩放该轴的方向
 	// 如果未选择轴，则可以缩放两个方向
 
-	if (ui->customPlot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
-		ui->customPlot->axisRect()->setRangeZoom(ui->customPlot->xAxis->orientation());
-	else if (ui->customPlot->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
-		ui->customPlot->axisRect()->setRangeZoom(ui->customPlot->yAxis->orientation());
+	if (this->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
+		this->axisRect()->setRangeZoom(this->xAxis->orientation());
+	else if (this->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
+		this->axisRect()->setRangeZoom(this->yAxis->orientation());
 	else
-		ui->customPlot->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
+		this->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
 }
+/*
+	参考自：https://github.com/SEASKY-Master/vSailorProject
+*/
+/*光标追踪数据点*/
+void FitChart::mouseMove(QMouseEvent *ev)
+{
+	if (mxTracer == nullptr)
+	{
+		return;
+	}
+	if (this->selectedGraphs().size() <= 0)
+	{
+		mxTracer->setVisible(false);
+		QCustomPlot::mouseMoveEvent(ev);
+		return;
+	}
+	mxTracer->setVisible(true);
+	// 获取容器
+	QSharedPointer<QCPGraphDataContainer> tmpContainer;
+	tmpContainer = this->selectedGraphs().first()->data();
+	// 获取x,y轴坐标
+	double x = 0;
+	double y = 0;
+	{
+		// 使用二分法快速查找所在点数据
+		x = this->xAxis->pixelToCoord(ev->pos().x());
+		int low = 0, high = tmpContainer->size();
+		while (high > low)
+		{
+			int middle = (low + high) / 2;
+			if (x < tmpContainer->constBegin()->mainKey() ||
+				x > (tmpContainer->constEnd() - 1)->mainKey())
+				break;
+
+			if (x == (tmpContainer->constBegin() + middle)->mainKey())
+			{
+				y = (tmpContainer->constBegin() + middle)->mainValue();
+				break;
+			}
+			if (x > (tmpContainer->constBegin() + middle)->mainKey())
+			{
+				low = middle;
+			}
+			else if (x < (tmpContainer->constBegin() + middle)->mainKey())
+			{
+				high = middle;
+			}
+			if (high - low <= 1)
+			{ // 差值计算所在位置数据
+				y = (tmpContainer->constBegin() + low)->mainValue() + ((x - (tmpContainer->constBegin() + low)->mainKey()) *
+																	   ((tmpContainer->constBegin() + high)->mainValue() - (tmpContainer->constBegin() + low)->mainValue())) /
+																		  ((tmpContainer->constBegin() + high)->mainKey() - (tmpContainer->constBegin() + low)->mainKey());
+				break;
+			}
+		}
+	}
+	// 更新Tracer
+	QString text = "X:" + QString::number(x, 'g', 6) + " Y:" + QString::number(y, 'g', 6);
+	mxTracer->updatePosition(x, y);
+	mxTracer->setText(text);
+	/*重新显示*/
+	QCustomPlot::mouseMoveEvent(ev);
+}
+
 // 寻找曲线
 void FitChart::findGraph()
 {
-	ui->customPlot->rescaleAxes(true); // 调整显示区域
-	ui->customPlot->replot();		   // 刷新画图
+	this->rescaleAxes(true); // 调整显示区域
+	this->replot();			 // 刷新画图
 }
 
 // 更新采集的数据曲线
@@ -197,11 +263,11 @@ void FitChart::updateCollectPlot(QVector<double> x, QVector<double> y)
 {
 	qDebug() << "更新采集的数据曲线";
 	// 添加数据
-	ui->customPlot->graph(0)->setData(x, y);
+	this->graph(0)->setData(x, y);
 	// rescalseValueAxis
-	ui->customPlot->rescaleAxes(); // 调整显示区域（要画完才调用）只会缩小 不会放大
-	// ui->customPlot->xAxis->setRange(x, xRange, Qt::AlignRight); // 曲线能动起来的关键在这里，设定x轴范围为最近xRange个数据 右对齐
-	ui->customPlot->replot(); // 刷新画图
+	this->rescaleAxes(); // 调整显示区域（要画完才调用）只会缩小 不会放大
+	// this->xAxis->setRange(x, xRange, Qt::AlignRight); // 曲线能动起来的关键在这里，设定x轴范围为最近xRange个数据 右对齐
+	this->replot(); // 刷新画图
 }
 
 // 更新拟合曲线
@@ -209,10 +275,10 @@ void FitChart::updateFitPlot(QVector<double> x, QVector<double> y)
 {
 	qDebug() << "更新拟合曲线";
 	// 添加数据
-	ui->customPlot->graph(1)->setData(x, y);
+	this->graph(1)->setData(x, y);
 	// rescalseValueAxis
-	// ui->customPlot->rescaleAxes(); // 调整显示区域（要画完才调用）只会缩小 不会放大
-	ui->customPlot->replot(); // 刷新画图
+	// this->rescaleAxes(); // 调整显示区域（要画完才调用）只会缩小 不会放大
+	this->replot(); // 刷新画图
 }
 
 void FitChart::addVLine(double x)
@@ -225,37 +291,37 @@ void FitChart::addHLine(double y)
 // 清空图线
 void FitChart::clear()
 {
-	ui->customPlot->graph(0)->data()->clear();
-	ui->customPlot->graph(1)->data()->clear();
-	ui->customPlot->replot();
+	this->graph(0)->data()->clear();
+	this->graph(1)->data()->clear();
+	this->replot();
 }
 
 // 隐藏采集的数据曲线
 void FitChart::hideCollectPlot()
 {
-	ui->customPlot->graph(0)->setVisible(false);
-	ui->customPlot->replot();
+	this->graph(0)->setVisible(false);
+	this->replot();
 }
 
 // 显示采集的数据曲线
 void FitChart::showCollectPlot()
 {
-	ui->customPlot->graph(0)->setVisible(true);
-	ui->customPlot->replot();
+	this->graph(0)->setVisible(true);
+	this->replot();
 }
 
 // 隐藏拟合曲线
 void FitChart::hideFitPlot()
 {
-	ui->customPlot->graph(1)->setVisible(false);
-	ui->customPlot->replot();
+	this->graph(1)->setVisible(false);
+	this->replot();
 }
 
 // 显示拟合曲线
 void FitChart::showFitPlot()
 {
-	ui->customPlot->graph(1)->setVisible(true);
-	ui->customPlot->replot();
+	this->graph(1)->setVisible(true);
+	this->replot();
 }
 
 // 右键菜单
@@ -264,7 +330,7 @@ void FitChart::contextMenuRequest(QPoint pos)
 	QMenu *menu = new QMenu(this);
 	menu->setAttribute(Qt::WA_DeleteOnClose);
 
-	if (ui->customPlot->legend->selectTest(pos, false) >= 0) // 请求曲线标签上的右键菜单
+	if (this->legend->selectTest(pos, false) >= 0) // 请求曲线标签上的右键菜单
 	{
 		menu->addAction("移到左上角", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop | Qt::AlignLeft));
 		menu->addAction("移到正上方", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop | Qt::AlignHCenter));
@@ -276,17 +342,17 @@ void FitChart::contextMenuRequest(QPoint pos)
 	{
 		menu->addAction("适应图线范围", this, &FitChart::findGraph);
 		// menu->addAction("清空绘图", this, &FitChart::clear);
-		if (ui->customPlot->graph(0)->visible())
+		if (this->graph(0)->visible())
 			menu->addAction("隐藏采集数据", this, &FitChart::hideCollectPlot);
 		else
 			menu->addAction("显示采集数据", this, &FitChart::showCollectPlot);
 
-		if (ui->customPlot->graph(1)->visible())
+		if (this->graph(1)->visible())
 			menu->addAction("隐藏拟合曲线", this, &FitChart::hideFitPlot);
 		else
 			menu->addAction("显示拟合曲线", this, &FitChart::showFitPlot);
 	}
-	menu->popup(ui->customPlot->mapToGlobal(pos));
+	menu->popup(this->mapToGlobal(pos));
 }
 
 // 移动曲线标签
@@ -298,8 +364,8 @@ void FitChart::moveLegend()
 		int dataInt = contextAction->data().toInt(&ok);
 		if (ok)
 		{
-			ui->customPlot->axisRect()->insetLayout()->setInsetAlignment(0, (Qt::Alignment)dataInt);
-			ui->customPlot->replot();
+			this->axisRect()->insetLayout()->setInsetAlignment(0, (Qt::Alignment)dataInt);
+			this->replot();
 		}
 	}
 }
