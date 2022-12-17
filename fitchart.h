@@ -27,14 +27,19 @@ public slots:
 
     void clear();
 
+protected:
+    // 滚轮
+    void wheelEvent(QWheelEvent *ev);
+    // 鼠标点击事件
+    void mousePressEvent(QMouseEvent *ev);
+    // 鼠标移动事件
+    void mouseMoveEvent(QMouseEvent *ev);
+
 private slots:
     void axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part);
     void axisXYDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part);
     void legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *item);
     void selectionChanged();
-    void mousePress();
-    void mouseWheel();
-    void mouseMove(QMouseEvent *ev);
 
     void moveLegend();
     void findGraph();

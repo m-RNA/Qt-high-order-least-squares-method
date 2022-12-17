@@ -45,12 +45,11 @@ FitChart::FitChart(QWidget *parent) : QCustomPlot(parent)
 	// 连接将某些轴选择连接在一起的插槽（尤其是对面的轴）：
 	connect(this, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
 
+	// 函数重载就不用连接槽了
 	// 连接插槽，注意选择轴时，只能拖动和缩放该方向：
-	connect(this, &QCustomPlot::mousePress, this, &FitChart::mousePress);
-	connect(this, &QCustomPlot::mouseWheel, this, &FitChart::mouseWheel);
-	// connect(this, SIGNAL(mousePressEvent(QMouseEvent *)), this, SLOT(mousePressEvent(QMouseEvent *)));
-	// connect(this, SIGNAL(mouseWheel(QWheelEvent *)), this, SLOT(mouseWheel()));
-	//    connect(this, &QCustomPlot::mouseMove, this, &FitChart::mouseMove);
+	// connect(this, &QCustomPlot::mousePress, this, &FitChart::mousePress);
+	// connect(this, &QCustomPlot::mouseWheel, this, &FitChart::mouseWheel);
+	// connect(this, &QCustomPlot::mouseMove, this, &FitChart::mouseMove);
 
 	// 使底部和左侧轴将其范围镜像到顶部和右侧轴：
 	connect(this->xAxis, SIGNAL(rangeChanged(QCPRange)), this->xAxis2, SLOT(setRange(QCPRange)));
@@ -160,8 +159,12 @@ void FitChart::selectionChanged()
 		}
 	}
 }
-// 长按鼠标
-void FitChart::mousePress()
+
+/*
+	参考自：https://github.com/SEASKY-Master/vSailorProject
+*/
+// 鼠标点击事件（函数重载）
+void FitChart::mousePressEvent(QMouseEvent *ev)
 {
 	// 如果选择了轴，则只允许拖动该轴的方向
 	// 如果未选择轴，则可以拖动两个方向
@@ -172,10 +175,11 @@ void FitChart::mousePress()
 		this->axisRect()->setRangeDrag(this->yAxis->orientation());
 	else
 		this->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
-	// QCustomPlot::mousePressEvent(ev);
+	QCustomPlot::mousePressEvent(ev);
 }
-// 鼠标滚轮
-void FitChart::mouseWheel()
+
+// 鼠标滚轮事件（函数重载）
+void FitChart::wheelEvent(QWheelEvent *ev)
 {
 	// 如果选择了轴，则只允许缩放该轴的方向
 	// 如果未选择轴，则可以缩放两个方向
@@ -186,12 +190,12 @@ void FitChart::mouseWheel()
 		this->axisRect()->setRangeZoom(this->yAxis->orientation());
 	else
 		this->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
+	QCustomPlot::wheelEvent(ev);
 }
-/*
-	参考自：https://github.com/SEASKY-Master/vSailorProject
-*/
+
+// 鼠标移动事件（函数重载）
 /*光标追踪数据点*/
-void FitChart::mouseMove(QMouseEvent *ev)
+void FitChart::mouseMoveEvent(QMouseEvent *ev)
 {
 	if (mxTracer == nullptr)
 	{
