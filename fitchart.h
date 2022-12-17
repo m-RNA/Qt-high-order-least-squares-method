@@ -54,8 +54,7 @@ private slots:
 private:
     ChartTracer *mxTracer = nullptr; // 坐标跟随鼠标.使用时创建
 
-    unsigned int x_default = 0;
-    double xRange = 80;
+    int x_default = 0;
 };
 
 #endif // CUSTOMCHART_H

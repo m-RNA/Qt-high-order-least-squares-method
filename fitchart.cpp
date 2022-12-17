@@ -89,17 +89,22 @@ void FitChart::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 // 双击坐标轴
 void FitChart::axisXYDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part)
 {
+	double upper = axis->range().upper;
+	double lower = axis->range().lower;
+	double range = upper - lower;
 	// 通过双击轴来设置轴范围
 	if (part == QCPAxis::spAxis)
 	{
 		bool ok;
-		double newRange = QInputDialog::getDouble(this, "设置范围", "新的坐标轴范围", xRange /*axis->range()*/, 0, 99999, 1, &ok, Qt::WindowCloseButtonHint);
-		if (newRange > 0.001)
-			xRange = newRange;
+		double newRange = QInputDialog::getDouble(this, "设置范围", "新的坐标轴范围", range, 0, 99999, 1, &ok, Qt::WindowCloseButtonHint);
+
 		if (ok)
 		{
-			axis->setRange(x_default, xRange, Qt::AlignRight); // 右对齐
-			this->replot();
+			if (newRange > 0.001)
+			{
+				axis->setRange(axis->range().upper, newRange, Qt::AlignRight); // 右对齐
+				this->replot();
+			}
 		}
 	}
 }
