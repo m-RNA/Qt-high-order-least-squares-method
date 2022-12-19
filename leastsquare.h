@@ -31,22 +31,22 @@ private slots:
 
     void on_twAverage_itemChanged(QTableWidgetItem *item);
 
-    void setFitChartData(QVector<double> factor);
+    void setFitChartData(vector<double> factor);
 
 signals:
     void collectDataXYChanged(QVector<double> x, QVector<double> y);
-    void fitDataChanged(QVector<double> x, QVector<double> y);
+    void fitDataChanged(vector<double> x, vector<double> y);
 
-    void startGenerate(int t_left, int t_right, double t_step, QVector<double> t_factor);
-    void startLeastSquare(int t_N, QVector<double> t_x, QVector<double> t_y);
+    void startGenerate(int t_left, int t_right, double t_step, vector<double> t_factor);
+    void startLeastSquare(int t_N, vector<double> t_x, vector<double> t_y);
 
 private:
     Ui::LeastSquare *ui;
-    int order;          // 最小二乘法多项式阶数
+    unsigned long long order;          // 最小二乘法多项式阶数
     int samplePointSum; // 标定点数
-    QVector<double> collectDataX, collectDataY;
+    vector<double> collectDataX, collectDataY;
     double collectDataX_Max, collectDataX_Min;
-    QVector<double> fitDataX, fitDataY;
+    vector<double> fitDataX, fitDataY;
     QRegExp rx;
     QString old_text = "";
 

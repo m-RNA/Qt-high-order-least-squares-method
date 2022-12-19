@@ -10,13 +10,13 @@
     qt中获取容器Vector中的最大值和最小值：
     https://blog.csdn.net/Littlehero_121/article/details/100565527
 */
-double max(QVector<double> &data)
+double max(vector<double> &data)
 {
     auto max = std::max_element(std::begin(data), std::end(data));
     return *max;
 }
 
-double min(QVector<double> &data)
+double min(vector<double> &data)
 {
     auto min = std::min_element(std::begin(data), std::end(data));
     return *min;
@@ -64,7 +64,6 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
     }
 
     connect(this, &LeastSquare::collectDataXYChanged, ui->chartFit, &FitChart::updateCollectPlot);
-    // connect(this, &LeastSquare::fitDataChanged, ui->chartFit, &FitChart::updateFitPlot);
 
     // 2. 链接子线程
     connect(this, &LeastSquare::startGenerate, taskGen, &Bll_GenerateData::setGenerateFitData);
@@ -92,8 +91,8 @@ void LeastSquare::updateCollectDataXY(void)
             continue;
         // qDebug() << "counter" << counter;
 
-        collectDataX << qsX.toDouble();
-        collectDataY << qsY.toDouble();
+        collectDataX.push_back(qsX.toDouble());
+        collectDataY.push_back(qsY.toDouble());
         qDebug() << i << ":" << qsX << qsY;
     }
 }
@@ -102,7 +101,7 @@ void LeastSquare::updateCollectDataXY(void)
 void LeastSquare::tryUpdateFitChart(bool man)
 {
     updateCollectDataXY();
-    if (collectDataX.length() < 2)
+    if (collectDataX.size() < 2)
     {
         if (man) // 是人为的就要提醒一下
             QMessageBox::critical(this, "错误", "正确格式的数据\n小于两组");
@@ -111,8 +110,8 @@ void LeastSquare::tryUpdateFitChart(bool man)
 
     // N个点可以确定一个 唯一的 N-1 阶的曲线
     order = ui->spbxOrder->text().toInt();
-    if (collectDataX.length() <= order)
-        order = collectDataX.length() - 1;
+    if (collectDataX.size() <= order)
+        order = collectDataX.size() - 1;
 
     // 启动子线程
     emit startLeastSquare(order, collectDataX, collectDataY);
@@ -150,9 +149,9 @@ void LeastSquare::on_btnFit_clicked()
     tryUpdateFitChart(true);
 }
 
-void LeastSquare::setFitChartData(QVector<double> factor)
+void LeastSquare::setFitChartData(vector<double> factor)
 {
-    for (int i = 0; i <= order; i++)
+    for (unsigned long long i = 0; i <= order; i++)
     {
         // 通过setItem来改变条目
         QTableWidgetItem *temp = new QTableWidgetItem(QString::number(factor.at(order - i)));
@@ -199,8 +198,13 @@ void LeastSquare::on_twAverage_itemChanged(QTableWidgetItem *item)
             return; // 当有一格为空时，退出
 
         updateCollectDataXY();
-        if (collectDataX.length() > 0)
-            emit collectDataXYChanged(collectDataX, collectDataY);
+        if (collectDataX.size() > 0)
+        {
+            QVector<double> qv_X = QVector<double>(collectDataX.begin(), collectDataX.end());
+            QVector<double> qv_Y = QVector<double>(collectDataY.begin(), collectDataY.end());
+
+            emit collectDataXYChanged(qv_X, qv_Y);
+        }
     }
     else
     {
