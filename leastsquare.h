@@ -29,7 +29,7 @@ private slots:
 
     void on_twAverage_itemSelectionChanged();
 
-    void on_twAverage_itemChanged(QTableWidgetItem *item);
+    void twAverage_itemChanged(QTableWidgetItem *item);
 
     void setFitChartData(vector<double> factor);
 
@@ -42,8 +42,8 @@ signals:
 
 private:
     Ui::LeastSquare *ui;
-    unsigned long long order;          // 最小二乘法多项式阶数
-    int samplePointSum; // 标定点数
+    unsigned long long order; // 最小二乘法多项式阶数
+    int samplePointSum;       // 标定点数
     vector<double> collectDataX, collectDataY;
     double collectDataX_Max, collectDataX_Min;
     vector<double> fitDataX, fitDataY;
