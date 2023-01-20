@@ -237,13 +237,26 @@ void LeastSquare::twAverage_itemChanged(QTableWidgetItem *item)
     if (str == "")
     {
         qDebug() << "空字符";
+        if (old_text == "")
+            return;
+
         goto GO_ON;
+    }
+
+    // 去除字符串结尾的空格、回车、换行
+    while (str[str.length() - 1] == ' ' || str[str.length() - 1] == '\n' || str[str.length() - 1] == '\r')
+    {
+        str = str.left(str.length() - 1);
+        qDebug() << "去除空格";
+        if (str == "")
+            break;
     }
 
     // 完全匹配
     if (reg.exactMatch(str))
     {
         qDebug() << "匹配成功";
+        ui->twAverage->item(ui->twAverage->currentRow(), ui->twAverage->currentColumn())->setText(str);
 
     GO_ON:
         updateCollectDataXY();
