@@ -72,8 +72,8 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
     ui->twAverage->verticalHeader()->setVisible(true);
     ui->twAverage->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); // 自适应缩放
     ui->twAverage->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);     // 不可调整
+    
     ui->twFactor->horizontalHeader()->setVisible(true);
-
     ui->twFactor->verticalHeader()->setVisible(true);
     ui->twFactor->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); // 自适应缩放
     ui->twFactor->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);     // 不可调整
