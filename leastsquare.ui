@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>615</width>
-    <height>449</height>
+    <width>622</width>
+    <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,7 +42,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>250</width>
         <height>16777215</height>
        </size>
       </property>
@@ -89,6 +89,12 @@
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="3" column="0">
          <widget class="QLabel" name="label_19">
+          <property name="minimumSize">
+           <size>
+            <width>12</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>48</width>
@@ -105,6 +111,18 @@
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_20">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>12</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>48</width>
@@ -121,6 +139,12 @@
         </item>
         <item row="0" column="1">
          <widget class="QSpinBox" name="spbxSamplePointSum">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimum">
            <number>2</number>
           </property>
@@ -131,16 +155,31 @@
         </item>
         <item row="3" column="1">
          <widget class="QSpinBox" name="spbxOrder">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimum">
            <number>1</number>
           </property>
           <property name="maximum">
            <number>6</number>
           </property>
+          <property name="value">
+           <number>4</number>
+          </property>
          </widget>
         </item>
         <item row="4" column="0">
          <widget class="QLabel" name="label_25">
+          <property name="minimumSize">
+           <size>
+            <width>12</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>48</width>
@@ -250,7 +289,7 @@
         <item row="2" column="0">
          <widget class="QTableWidget" name="twFactor">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -262,7 +301,7 @@
            <bool>true</bool>
           </property>
           <property name="rowCount">
-           <number>2</number>
+           <number>5</number>
           </property>
           <property name="columnCount">
            <number>1</number>
@@ -276,6 +315,9 @@
           <attribute name="verticalHeaderVisible">
            <bool>false</bool>
           </attribute>
+          <row/>
+          <row/>
+          <row/>
           <row/>
           <row/>
           <column/>

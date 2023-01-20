@@ -1,6 +1,6 @@
 TEMPLATE = app
-CONFIG +=  c++11
-#console
+CONFIG +=  c++11 console
+
 QT       += core gui printsupport serialport
 
 INCLUDEPATH += D:\eigen-3.3.8 D:\Qt\ThirdPartyLib\qcustomplot
@@ -21,4 +21,5 @@ HEADERS += \
     bll_leastssquare.h \
     charttracer.h \
     fitchart.h \
-    leastsquare.h
+    leastsquare.h \
+    config.h 

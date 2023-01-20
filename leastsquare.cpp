@@ -10,16 +10,49 @@
     qt中获取容器Vector中的最大值和最小值：
     https://blog.csdn.net/Littlehero_121/article/details/100565527
 */
-double max(vector<double> &data)
+DECIMAL_TYPE max(vector<DECIMAL_TYPE> &data)
 {
     auto max = std::max_element(std::begin(data), std::end(data));
     return *max;
 }
 
-double min(vector<double> &data)
+DECIMAL_TYPE min(vector<DECIMAL_TYPE> &data)
 {
     auto min = std::min_element(std::begin(data), std::end(data));
     return *min;
+}
+
+DECIMAL_TYPE atold(const char *str)
+{
+    bool negativeFlag = false;
+    if (str[0] == '-')
+    {
+        negativeFlag = true;
+        str++;
+    }
+    else if (str[0] == '+')
+    {
+        str++;
+    }
+
+    unsigned long long allNum = 0;
+    unsigned long long count = 1;
+    bool dotFlag = false;
+    while (*str)
+    {
+        if (*str == '.')
+        {
+            dotFlag = true;
+            str++;
+            continue;
+        }
+        if (dotFlag == true)
+            count *= 10;
+
+        allNum = allNum * 10 + (*str - '0');
+        str++;
+    }
+    return negativeFlag ? -((DECIMAL_TYPE)allNum / count) : ((DECIMAL_TYPE)allNum / count);
 }
 
 LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
@@ -32,7 +65,8 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
     taskLeastSquare = new Bll_LeastSquareMethod(this);
 
     samplePointSum = ui->twAverage->rowCount();
-    order = ui->spbxOrder->value();
+    ui->spbxSamplePointSum->setValue(samplePointSum);
+    order = ui->spbxOrder->text().toInt();
 
     ui->twAverage->horizontalHeader()->setVisible(true);
     ui->twAverage->verticalHeader()->setVisible(true);
@@ -53,7 +87,8 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
     HorizontalHeader << "N-1 阶系数";
     ui->twFactor->setHorizontalHeaderLabels(HorizontalHeader); // 设置表头
 
-    for (int i = 0; i < samplePointSum; i++) // 需要初始化表格Item
+    // 需要初始化表格Item
+    for (int i = 0; i < samplePointSum; i++)
     {
         for (int j = 0; j < 2; j++)
         {
@@ -81,6 +116,7 @@ LeastSquare::~LeastSquare()
 
 void LeastSquare::updateCollectDataXY(void)
 {
+    DECIMAL_TYPE temp;
     QString qsX, qsY;
     collectDataX.clear(); // 重置x容器
     collectDataY.clear(); // 重置y容器
@@ -92,8 +128,15 @@ void LeastSquare::updateCollectDataXY(void)
             continue;
         // qDebug() << "counter" << counter;
 
-        collectDataX.push_back(qsX.toDouble());
-        collectDataY.push_back(qsY.toDouble());
+        temp = atold(qsX.toStdString().c_str());
+        collectDataX.push_back(temp);
+        printf("LeastSquare::updateCollectDataXY    atold x = %.20LE\n", temp);
+        printf("LeastSquare::updateCollectDataXY toDouble x = %.20e\n", qsX.toDouble());
+        temp = atold(qsY.toStdString().c_str());
+        collectDataY.push_back(temp);
+        printf("LeastSquare::updateCollectDataXY    atold y = %.20LE\n", temp);
+        printf("LeastSquare::updateCollectDataXY toDouble y = %.20e\n", qsY.toDouble());
+
         qDebug() << i << ":" << qsX << qsY;
     }
 }
@@ -150,20 +193,24 @@ void LeastSquare::on_btnFit_clicked()
     tryUpdateFitChart(true);
 }
 
-void LeastSquare::setFitChartData(vector<double> factor)
+void LeastSquare::setFitChartData(vector<DECIMAL_TYPE> factor)
 {
+    char buffer[200];
     for (unsigned long long i = 0; i <= order; i++)
     {
         // 通过setItem来改变条目
-        QTableWidgetItem *temp = new QTableWidgetItem(QString::number(factor.at(order - i)));
+        snprintf(buffer, sizeof(buffer), "%.8LE", factor.at(order - i));
+        // printf("LeastSquare::setFitChartData %s\r\n", buffer);
+        QTableWidgetItem *temp = new QTableWidgetItem(buffer); // QString::fromStdString(buffer));
         ui->twFactor->setItem(i, 0, temp);
+        ui->twFactor->item(i, 0)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
     }
     collectDataX_Max = max(collectDataX);
     collectDataX_Min = min(collectDataX);
-    double addRange = (collectDataX_Max - collectDataX_Min) / 4.0;
+    DECIMAL_TYPE addRange = (collectDataX_Max - collectDataX_Min) / 4.0f;
 
-    // 启动子线程
-    emit startGenerate(collectDataX_Min - addRange, collectDataX_Max + addRange, 0.25, factor); // fitDataX, fitDataY);
+    // 启动子线程 生成曲线数据
+    emit startGenerate(collectDataX_Min - addRange, collectDataX_Max + addRange, 0.25f, factor); // fitDataX, fitDataY);
     QThreadPool::globalInstance()->start(taskGen);
 }
 
