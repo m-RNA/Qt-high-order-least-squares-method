@@ -22,7 +22,7 @@ DECIMAL_TYPE min(vector<DECIMAL_TYPE> &data)
     return *min;
 }
 
-DECIMAL_TYPE atold(const char *str)
+DECIMAL_TYPE atoDec(const char *str)
 {
     bool negativeFlag = false;
     if (str[0] == '-')
@@ -72,7 +72,7 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
     ui->twAverage->verticalHeader()->setVisible(true);
     ui->twAverage->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); // 自适应缩放
     ui->twAverage->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);     // 不可调整
-    
+
     ui->twFactor->horizontalHeader()->setVisible(true);
     ui->twFactor->verticalHeader()->setVisible(true);
     ui->twFactor->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); // 自适应缩放
@@ -128,13 +128,13 @@ void LeastSquare::updateCollectDataXY(void)
             continue;
         // qDebug() << "counter" << counter;
 
-        temp = atold(qsX.toStdString().c_str());
+        temp = atoDec(qsX.toStdString().c_str());
         collectDataX.push_back(temp);
-        printf("LeastSquare::updateCollectDataXY    atold x = %.20LE\n", temp);
+        printf("LeastSquare::updateCollectDataXY atoDec   x = %.20LE\n", temp);
         printf("LeastSquare::updateCollectDataXY toDouble x = %.20e\n", qsX.toDouble());
-        temp = atold(qsY.toStdString().c_str());
+        temp = atoDec(qsY.toStdString().c_str());
         collectDataY.push_back(temp);
-        printf("LeastSquare::updateCollectDataXY    atold y = %.20LE\n", temp);
+        printf("LeastSquare::updateCollectDataXY atoDec   y = %.20LE\n", temp);
         printf("LeastSquare::updateCollectDataXY toDouble y = %.20e\n", qsY.toDouble());
 
         qDebug() << i << ":" << qsX << qsY;
@@ -195,19 +195,18 @@ void LeastSquare::on_btnFit_clicked()
 
 void LeastSquare::setFitChartData(vector<DECIMAL_TYPE> factor)
 {
-    char buffer[200];
     for (unsigned long long i = 0; i <= order; i++)
     {
         // 通过setItem来改变条目
-        snprintf(buffer, sizeof(buffer), "%.8LE", factor.at(order - i));
+        snprintf(globalStringBuffer, sizeof(globalStringBuffer), "%.8LE", factor.at(order - i));
         // printf("LeastSquare::setFitChartData %s\r\n", buffer);
-        QTableWidgetItem *temp = new QTableWidgetItem(buffer); // QString::fromStdString(buffer));
+        QTableWidgetItem *temp = new QTableWidgetItem(globalStringBuffer); // QString::fromStdString(globalStringBuffer));
         ui->twFactor->setItem(i, 0, temp);
         ui->twFactor->item(i, 0)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
     }
     collectDataX_Max = max(collectDataX);
     collectDataX_Min = min(collectDataX);
-    DECIMAL_TYPE addRange = (collectDataX_Max - collectDataX_Min) / 4.0f;
+    DECIMAL_TYPE addRange = (collectDataX_Max - collectDataX_Min) / 2.0f;
 
     // 启动子线程 生成曲线数据
     emit startGenerate(collectDataX_Min - addRange, collectDataX_Max + addRange, 0.25f, factor); // fitDataX, fitDataY);
