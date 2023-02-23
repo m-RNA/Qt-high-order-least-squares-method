@@ -254,8 +254,12 @@ void LeastSquare::twAverage_itemChanged(QTableWidgetItem *item)
     // 完全匹配
     if (reg.exactMatch(str))
     {
-        qDebug() << "匹配成功";
-        ui->twAverage->item(ui->twAverage->currentRow(), ui->twAverage->currentColumn())->setText(str);
+        qDebug() << "正则匹配成功";
+
+        // qDebug() << ui->twAverage->currentRow(); // 没选择单元格 值为-1
+        // qDebug() << ui->twAverage->currentColumn(); // 没选择单元格 值为-1
+        // 下面的这条代码会导致其他移植的程序崩溃，而且它本来就是多余的
+        // ui->twAverage->item(ui->twAverage->currentRow(), ui->twAverage->currentColumn())->setText(str);
 
     GO_ON:
         updateCollectDataXY();
@@ -268,7 +272,7 @@ void LeastSquare::twAverage_itemChanged(QTableWidgetItem *item)
     }
     else
     {
-        qDebug() << "匹配失败";
+        qDebug() << "正则匹配失败";
         item->setText(old_text); // 更换之前的内容
     }
 }
