@@ -3,13 +3,19 @@
 
 FitChart::FitChart(QWidget *parent) : QCustomPlot(parent)
 {
-	mxTracer = new ChartTracer(this, this->graph(), TracerType::DataTracer);
+	setOpenGl(true);
+	qDebug() << "FitChart opengle=" << openGl();
 
-    setOpenGl(true);
-    qDebug()<<"opengle="<<openGl();
+	tracer = new QCPItemTracer(this);
+	tracer->setInterpolating(false);
+	tracer->setStyle(QCPItemTracer::tsCircle);
+	tracer->setPen(QPen(Qt::red));
+	tracer->setBrush(Qt::red);
+	tracer->setSize(10);
 
 	this->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
 						  QCP::iSelectLegend | QCP::iSelectPlottables);
+
 	this->xAxis->setRange(-8, 8);
 	this->yAxis->setRange(-5, 5);
 	this->axisRect()->setupFullAxesBox();
@@ -40,7 +46,7 @@ FitChart::FitChart(QWidget *parent) : QCustomPlot(parent)
 	this->graph()->setName(QString("拟合"));	   // .arg(this->graphCount()-1) 这个可以添加编号
 	this->graph()->setLineStyle(QCPGraph::lsLine); // 连线
 	this->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssNone));
-	pen.setColor(Qt ::red);
+	pen.setColor(Qt ::gray);
 	pen.setStyle(Qt::PenStyle::SolidLine); // 实线
 
 	this->graph()->setPen(pen);
@@ -70,7 +76,6 @@ FitChart::FitChart(QWidget *parent) : QCustomPlot(parent)
 
 FitChart::~FitChart()
 {
-	delete mxTracer;
 }
 
 // 双击坐标标签
@@ -205,64 +210,51 @@ void FitChart::wheelEvent(QWheelEvent *ev)
 /*光标追踪数据点*/
 void FitChart::mouseMoveEvent(QMouseEvent *ev)
 {
-	if (mxTracer == nullptr)
-	{
-		return;
-	}
-	if (this->selectedGraphs().size() <= 0)
-	{
-		mxTracer->setVisible(false);
-		QCustomPlot::mouseMoveEvent(ev);
-		return;
-	}
-	mxTracer->setVisible(true);
-	// 获取容器
-	QSharedPointer<QCPGraphDataContainer> tmpContainer;
-	tmpContainer = this->selectedGraphs().first()->data();
-	// 获取x,y轴坐标
-	double x = 0;
-	double y = 0;
-	{
-		// 使用二分法快速查找所在点数据
-		x = this->xAxis->pixelToCoord(ev->pos().x());
-		int low = 0, high = tmpContainer->size();
-		while (high > low)
-		{
-			int middle = (low + high) / 2;
-			if (x < tmpContainer->constBegin()->mainKey() ||
-				x > (tmpContainer->constEnd() - 1)->mainKey())
-				break;
+	// 获取鼠标位置的像素坐标
+	const QPointF pos = ev->localPos();
 
-			if (x == (tmpContainer->constBegin() + middle)->mainKey())
-			{
-				y = (tmpContainer->constBegin() + middle)->mainValue();
-				break;
-			}
-			if (x > (tmpContainer->constBegin() + middle)->mainKey())
-			{
-				low = middle;
-			}
-			else if (x < (tmpContainer->constBegin() + middle)->mainKey())
-			{
-				high = middle;
-			}
-			if (high - low <= 1)
-			{ // 差值计算所在位置数据
-				y = (tmpContainer->constBegin() + low)->mainValue() + ((x - (tmpContainer->constBegin() + low)->mainKey()) *
-																	   ((tmpContainer->constBegin() + high)->mainValue() - (tmpContainer->constBegin() + low)->mainValue())) /
-																		  ((tmpContainer->constBegin() + high)->mainKey() - (tmpContainer->constBegin() + low)->mainKey());
-				break;
-			}
+	// 遍历曲线，查找被选中的曲线
+	QCPGraph *selectedGraph = nullptr;
+	for (int i = 0; i < graphCount(); ++i)
+	{
+		QCPGraph *graph = this->graph(i);
+		if (graph->selected())
+		{
+			selectedGraph = graph;
+			break;
 		}
 	}
-	// 更新Tracer
-	QString text = "X:" + QString::number(x, 'g', 6) + " Y:" + QString::number(y, 'g', 6);
-	mxTracer->updatePosition(x, y);
-	mxTracer->setText(text);
-	/*重新显示*/
+
+	if (selectedGraph)
+	{
+		// 显示锚点
+		tracer->setVisible(true);
+
+		// 将锚点的x坐标设为鼠标位置所在的x轴值
+		tracer->setGraphKey(xAxis->pixelToCoord(pos.x()));
+
+		// 将锚点设置到被选中的曲线上
+		tracer->setGraph(selectedGraph);
+
+		// 显示tip框
+		const QPointF coords = tracer->position->coords();
+		QToolTip::showText(ev->globalPos(),
+						   tr("<h4>%1</h4><table><tr><td><h5>X: %2</h5></td><td>, </td><td><h5>Y: %3</h5></td></tr></table>")
+							   .arg(selectedGraph->name())
+							   .arg(QString::number(coords.x(), 'g', 6))
+							   .arg(QString::number(coords.y(), 'g', 6)),
+						   this, this->rect());
+	}
+	else
+	{
+		// 没有曲线被选中，不显示锚点
+		tracer->setVisible(false);
+	}
+
+	// 重绘
+	replot();
 	QCustomPlot::mouseMoveEvent(ev);
 }
-
 // 寻找曲线
 void FitChart::findGraph()
 {
