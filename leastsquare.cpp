@@ -260,7 +260,7 @@ void LeastSquare::twAverage_itemChanged(QTableWidgetItem *item)
         // qDebug() << ui->twAverage->currentRow(); // 没选择单元格 值为-1
         // qDebug() << ui->twAverage->currentColumn(); // 没选择单元格 值为-1
         // 下面的这条代码会导致其他移植的程序崩溃，而且它本来就是多余的
-        // ui->twAverage->item(ui->twAverage->currentRow(), ui->twAverage->currentColumn())->setText(str);
+        item->setText(str);
 
     GO_ON:
         updateCollectDataXY();
