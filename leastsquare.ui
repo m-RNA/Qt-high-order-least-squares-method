@@ -62,12 +62,12 @@
       <row/>
       <column>
        <property name="text">
-        <string>x</string>
+        <string>y</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>y</string>
+        <string>x</string>
        </property>
       </column>
      </widget>
