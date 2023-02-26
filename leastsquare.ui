@@ -287,7 +287,7 @@
          <number>2</number>
         </property>
         <item row="2" column="0">
-         <widget class="QTableWidget" name="twFactor">
+         <widget class="CVTable" name="twFactor">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
             <horstretch>0</horstretch>

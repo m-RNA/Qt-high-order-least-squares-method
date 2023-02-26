@@ -82,7 +82,8 @@
         "matrixfunctions": "cpp",
         "nonlinearoptimization": "cpp",
         "qtablewidget": "cpp",
-        "qkeyevent": "cpp"
+        "qkeyevent": "cpp",
+        "qclipboard": "cpp"
     },
     "cSpell.words": [
         "atold",

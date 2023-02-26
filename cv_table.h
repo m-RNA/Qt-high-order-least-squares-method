@@ -10,9 +10,12 @@ class CVTable : public QTableWidget
 public:
     explicit CVTable(QWidget *parent = nullptr);
 
-private:
-    void keyPressEvent(QKeyEvent *event);
+protected:
+    virtual void contextMenuEvent(QContextMenuEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
 
+private:
+    void cutSelectedCells();
     void copySelectedCells();
     void pasteSelectedCells();
     void removeSelectedCells();
