@@ -100,9 +100,10 @@ LeastSquare::LeastSquare(QWidget *parent) : QWidget(parent),
     }
     connect(ui->twAverage, &QTableWidget::itemChanged, this, &LeastSquare::twAverage_itemChanged);
 
+    // 连接更新表格信号
     connect(this, &LeastSquare::collectDataXYChanged, ui->chartFit, &FitChart::updateCollectPlot);
 
-    // 2. 链接子线程
+    // 链接子线程
     connect(this, &LeastSquare::startGenerate, taskGen, &Bll_GenerateData::setGenerateFitData);
     connect(taskGen, &Bll_GenerateData::generateFitDataFinish, ui->chartFit, &FitChart::updateFitPlot);
 

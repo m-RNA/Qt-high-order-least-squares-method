@@ -80,7 +80,9 @@
         "orderingmethods": "cpp",
         "fft": "cpp",
         "matrixfunctions": "cpp",
-        "nonlinearoptimization": "cpp"
+        "nonlinearoptimization": "cpp",
+        "qtablewidget": "cpp",
+        "qkeyevent": "cpp"
     },
     "cSpell.words": [
         "atold",

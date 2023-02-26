@@ -9,6 +9,7 @@ INCLUDEPATH += D:\eigen-3.3.8 D:\Qt\ThirdPartyLib\qcustomplot
 SOURCES += \
         D:/Qt/ThirdPartyLib/qcustomplot/qcustomplot.cpp \
         bll_leastssquare.cpp \
+        cv_table.cpp \
         fitchart.cpp \
         leastsquare.cpp \
         main.cpp \
@@ -22,6 +23,7 @@ HEADERS += \
     bll_leastssquare.h \
     fitchart.h \
     leastsquare.h \
-    config.h 
+    cv_table.h\
+    config.h
 DEFINES += QCUSTOMPLOT_USE_OPENGL
 LIBS+=-lopengl32 -lglu32
