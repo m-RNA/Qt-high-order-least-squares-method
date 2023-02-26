@@ -27,3 +27,6 @@ HEADERS += \
     config.h
 DEFINES += QCUSTOMPLOT_USE_OPENGL
 LIBS+=-lopengl32 -lglu32
+
+RESOURCES += \
+    ../TemperatureSensorCalibration/main.qrc

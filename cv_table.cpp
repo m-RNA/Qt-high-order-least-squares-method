@@ -12,15 +12,15 @@ void CVTable::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
     if (this->editTriggers() != QAbstractItemView::NoEditTriggers && !this->selectedRanges().isEmpty())
-        menu.addAction("剪切", this, &CVTable::cutSelectedCells);
+        menu.addAction(QIcon(":/icon/cut.ico"), "剪切", this, &CVTable::cutSelectedCells);
 
     if (!this->selectedRanges().isEmpty())
-        menu.addAction("复制", this, &CVTable::copySelectedCells);
+        menu.addAction(QIcon(":/icon/copy.ico"), "复制", this, &CVTable::copySelectedCells);
 
     if (this->editTriggers() != QAbstractItemView::NoEditTriggers)
     {
-        menu.addAction("粘贴", this, &CVTable::pasteSelectedCells);
-        menu.addAction("清空", this, &CVTable::removeSelectedCells);
+        menu.addAction(QIcon(":/icon/paste.ico"), "粘贴", this, &CVTable::pasteSelectedCells);
+        menu.addAction(QIcon(":/icon/clear.ico"), "清空", this, &CVTable::removeSelectedCells);
     }
 
     menu.exec(event->globalPos());
