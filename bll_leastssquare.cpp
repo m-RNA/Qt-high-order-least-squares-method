@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QElapsedTimer>
 #include "bll_leastssquare.h"
-#include "config.h"
 
 using namespace Eigen;
 typedef Matrix<DECIMAL_TYPE, Dynamic, Dynamic> MatrixX_Dec;
@@ -86,10 +85,10 @@ void Bll_LeastSquareMethod::run()
     // }
 
     // 调试用
-    for (int i = 0; i < x.size(); i++)
-    {
-        printf("%d %.20Lf, %.20Lf\r\n", i, x[i], y[i]);
-    }
+    // for (int i = 0; i < x.size(); i++)
+    // {
+    //     printf("%d %.20Lf, %.20Lf\r\n", i, x[i], y[i]);
+    // }
 
     // N个点可以确定一个 唯一的 N-1 阶的曲线
     if (x.size() <= N)
@@ -126,7 +125,7 @@ void Bll_LeastSquareMethod::run()
         DECIMAL_TYPE temp = W(i, 0);
         ans.push_back(temp);
         snprintf(globalStringBuffer, sizeof(globalStringBuffer), "%LE", temp);
-        qDebug() << globalStringBuffer; // QString::fromStdString(globalStringBuffer);
+        qDebug() << globalStringBuffer;
     }
     qDebug() << "生成拟合数据花费时间：" << eTimer.elapsed() << "ms";
     emit leastSquareMethodFinish(ans);
