@@ -28,7 +28,7 @@ void Bll_GenerateData::run()
 
     if (left > right)
     {
-        int temp = right;
+        DECIMAL_TYPE temp = right;
         right = left;
         left = temp;
     }
